@@ -1,0 +1,39 @@
+<h2>marketgoo Copies</h2>
+
+<form id="form">
+  <label>Url: <input type="url" name="url" value="https://doc-0g-ag-sheets.googleusercontent.com/pub/l5l039s6ni5uumqbsj9o11lmdc/3ss5pk7o7vs30ngq649dcmtvbg/1623953825000/102257710863423417544/*/e@2PACX-1vSUKGTiThmSPPeYLEHD2Wabv1LWNQ2-UX_8I-lPkiLIUksF7lfe_DLescboxbWJcrcxbSLCz0HIR82G?output=tsv" required></label>
+  <button name="action" value="cancel">Cancel</button>
+  <button name="action" value="update">Update</button>
+</form>
+<div id="notifications"></div>
+
+<script>
+const form = document.getElementById("form");
+const notifications = document.getElementById("notifications");
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const pluginMessage = {
+    type: event.submitter.value
+  };
+
+  for (const [key, value] of new FormData(event.target).entries()) {
+    pluginMessage[key] = value;
+  }
+
+  fetch(pluginMessage.url)
+    .then((res) => res.text())
+    .then((text) => {
+      const copies = {};
+
+      text.split("\n").forEach((line) => {
+        const [key, value] = line.trim().split("\t", 2);
+        copies[key] = value;
+      });
+
+      pluginMessage.copies = copies;
+      parent.postMessage({ pluginMessage }, '*');
+    });
+})
+</script>

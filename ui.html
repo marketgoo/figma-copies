@@ -2,12 +2,15 @@
 
 <form id="form">
   <div>
-    <label>Url: <input type="url" name="url" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSUKGTiThmSPPeYLEHD2Wabv1LWNQ2-UX_8I-lPkiLIUksF7lfe_DLescboxbWJcrcxbSLCz0HIR82G/pub?output=tsv" required></label>
+    <label>
+      <span>Url:</span>
+      <input type="url" name="url" value="" required placeholder="The TSV url of the Google Spreadsheet">
+    </label>
   </div>
 
   <footer>
-    <button name="action" value="cancel">Cancel</button>
     <button name="action" value="update">Update</button>
+    <button name="action" formnovalidate value="cancel">Cancel</button>
   </footer>
 </form>
 
@@ -15,6 +18,7 @@
   html {
     font-family: -apple-system, system-ui, sans-serif;
     font-size: 15px;
+    color: var(--black);
   }
   body {
     display: grid;
@@ -24,11 +28,18 @@
     min-height: 100vh;
     padding: 15px;
     box-sizing: border-box;
+    --black: #2c333e;
+    --gray: #57657a;
+    --gray-light: #bbc2ce;
     --primary: #0090DA;
     --primary-dark: #0070A8;
+    --primary-focus: #0090DA33;
+    --error: #de0220;
+    --error-dark: #ac0219;
+    --error-focus: #de022033;
   }
   #errors {
-    color: red;
+    color: var(--error);
   }
   form {
     margin: 0;
@@ -38,10 +49,10 @@
   footer {
     position: sticky;
     display: flex;
+    flex-direction: row-reverse;
     column-gap: 20px;
     bottom: 0;
     background-color: white;
-    justify-content: flex-end;
   }
   button {
     background: var(--primary);
@@ -70,18 +81,44 @@
     color: var(--primary-dark);
     border-color: var(--primary-dark);
   }
+  button:disabled {
+    background-color: var(--gray-light);
+    border-color: var(--gray-light);
+    color: var(--gray);
+  }
   input[type="url"],
   input[type="text"] {
     height: 40px;
     padding: 0 20px;
     border-radius: 4px;
+    border: solid 2px var(--gray-light);
     display: block;
     width: 100%;
     box-sizing: border-box;
     margin: 5px 0;
+    outline: 0;
+  }
+  input[type="url"]:focus,
+  input[type="text"]:focus {
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 4px var(--primary-focus);
+  }
+  input[type="url"]:placeholder-shown,
+  input[type="text"]:placeholder-shown {
+    border-color: var(--error-dark);
+    box-shadow: 0 0 0 4px var(--error-focus);
   }
   label {
-    display: block;
+    display: flex;
+    align-items: center;
+    column-gap: .5rem;
+  }
+  label > code,
+  label > span {
+    flex-basis: 100px;
+  }
+  label > input {
+    flex-grow: 1;
   }
   fieldset {
     border: solid 1px #ddd;
@@ -102,16 +139,25 @@ const form = document.getElementById("form");
 const errors = document.getElementById("errors");
 
 const responses = {
+  url (pluginMessage) {
+    form["url"].value = pluginMessage.url;
+  },
   info (pluginMessage) {
     const {nodes} = pluginMessage;
     const html = ["<div>"];
-  
+    let hasVariables = false;
     nodes.forEach((node) => {
+      const entries = Object.entries(node.vars);
+
+      if (!entries.length) {
+        return;
+      }
+      hasVariables = true;
       html.push("<fieldset>");
       html.push(`<legend>${node.copy}</legend>`);
   
-      for (const [name, value] of Object.entries(node.vars)) {
-        html.push(`<p><label>What's the value of <code>${name.trim()}</code>?<br><input type="text" name="${node.node.id}-${name}" value="${value.replace('"', "&quot;")}"></label></p>`);
+      for (const [name, value] of entries) {
+        html.push(`<p><label><code>${name.trim()}</code> <input placeholder="Value for this variable" type="text" name="${node.node.id}-${name}" value="${value.replace('"', "&quot;")}"></label></p>`);
       }
   
       html.push("</fieldset>");
@@ -119,11 +165,15 @@ const responses = {
 
     html.push('</div>');
     html.push('<footer>');
-    html.push('<button name="action" value="cancel">Cancel</button>');
-    html.push('<button name="action" value="info">Send info</button>');
+    html.push('<button name="action" value="info">Update copies</button>');
+    html.push('<button name="action" formnovalidate value="cancel">Cancel</button>');
     html.push('</footer>');
 
     form.innerHTML = html.join("\n");
+    
+    if (!hasVariables) {
+      actions.info({ type: "info" });
+    }
   },
   error(pluginMessage) {
     const { message, node, copy} = pluginMessage;
@@ -164,6 +214,8 @@ const actions = {
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
+
+  form.querySelectorAll("button").forEach((button) => button.disabled = true);
 
   const pluginMessage = {
     type: event.submitter.value

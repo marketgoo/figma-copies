@@ -1,5 +1,13 @@
-// const textSelection = figma.currentPage.selection.filter((i) => i.type === "TEXT");
-let nodes = figma.root.findAll((node) => node.type === "TEXT") as TextNode[];
+let nodes: TextNode[];
+
+const selection = figma.currentPage.selection.slice();
+
+if (selection.length) {
+  nodes = getTextNodes(selection);
+} else {
+  nodes = figma.root.findAll((node) => node.type === "TEXT") as TextNode[];
+}
+
 let nodeInfo: Info[];
 
 interface Info {
@@ -15,9 +23,16 @@ figma.showUI(__html__, {
   height: 500,
 });
 
+// Send document
+figma.ui.postMessage({
+  type: "url",
+  url: figma.root.getPluginData("url"),
+});
+
 figma.ui.onmessage = async (msg) => {
   switch (msg.type) {
     case "update":
+      figma.root.setPluginData("url", msg.url);
       await searchCopies(msg);
       break;
     case "info":
@@ -166,4 +181,18 @@ function getChartStyle(node, index) {
 
 function getCopyRanges(html) {
   return html.split(/<[^>]+>/).filter((value) => value !== "");
+}
+
+function getTextNodes(nodes: (PageNode | SceneNode)[]): TextNode[] {
+  return nodes.reduce((result, node) => {
+    if (node.type === "TEXT") {
+      result.push(node);
+    } else if ("children" in node && Array.isArray(node.children)) {
+      const children = getTextNodes(node.children);
+      if (children.length > 0) {
+        result.push(...children);
+      }
+    }
+    return result;
+  }, []);
 }

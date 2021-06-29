@@ -1,7 +1,7 @@
 {
-  "name": "marketgoo-copies",
+  "name": "@marketgoo/copies",
   "version": "1.0.0",
-  "description": "Your Figma plugin",
+  "description": "Figma plugin to fetch and update copies automatically from Google spreadsheet.",
   "main": "code.js",
   "scripts": {
     "start": "npm run build -- -w",

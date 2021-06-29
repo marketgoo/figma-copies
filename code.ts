@@ -60,7 +60,6 @@ async function searchCopies(msg) {
     });
   } else {
     await updateCopies();
-    figma.closePlugin();
   }
 }
 
@@ -71,16 +70,18 @@ async function updateCopies() {
         /\{\{\s*([^\}]+)\s*\}\}/g,
         (match, name) => vars[name] || match,
       );
-      const ranges = getRanges(node, newCopy);
+      const [ranges, fontNames] = getRanges(node, newCopy);
+
+      await Promise.all(
+        fontNames.map((fontName) => figma.loadFontAsync(fontName)),
+      );
 
       for (const { start, end, fontName, newCopy } of ranges) {
-        await figma.loadFontAsync(fontName as FontName);
-
         node.insertCharacters(start, newCopy, "AFTER");
         node.deleteCharacters(start + newCopy.length, end + newCopy.length);
       }
     } catch (error) {
-      figma.ui.postMessage({
+      return figma.ui.postMessage({
         type: "error",
         message: error.message,
         node: node.name,
@@ -88,6 +89,8 @@ async function updateCopies() {
       });
     }
   }
+
+  figma.closePlugin();
 }
 
 async function updateInfo(msg) {
@@ -102,7 +105,6 @@ async function updateInfo(msg) {
   }
 
   await updateCopies();
-  figma.closePlugin();
 }
 
 function getInfo(node: TextNode, copy: string) {
@@ -126,10 +128,11 @@ function getInfo(node: TextNode, copy: string) {
 function getRanges(node, copy) {
   const nodeRanges = getNodeRanges(node);
   const copyRanges = getCopyRanges(copy);
+  const fontNames = new Set(nodeRanges.map((range) => range.fontName));
 
   if (nodeRanges.length > copyRanges.length) {
     nodeRanges.splice(copyRanges.length);
-  } else if (nodeRanges < copyRanges.length) {
+  } else if (nodeRanges.length < copyRanges.length) {
     const index = Math.max(0, nodeRanges.length - 1);
     const last = copyRanges.splice(index).join("");
     copyRanges.push(last);
@@ -140,12 +143,14 @@ function getRanges(node, copy) {
 
   let end = node.characters.length;
 
-  return nodeRanges.map((range, index) => {
+  const ranges = nodeRanges.map((range, index) => {
     range.newCopy = copyRanges[index];
     range.end = end;
     end = range.start;
     return range;
   });
+
+  return [ranges, [...fontNames]];
 }
 
 function getNodeRanges(node) {

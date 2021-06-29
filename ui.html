@@ -1,4 +1,4 @@
-<div id="errors"></div>
+<div id="errors" class="errors"></div>
 
 <form id="form">
   <div>
@@ -38,7 +38,10 @@
     --error-dark: #ac0219;
     --error-focus: #de022033;
   }
-  #errors {
+  p {
+    margin: 0;
+  }
+  .errors {
     color: var(--error);
   }
   form {
@@ -82,9 +85,9 @@
     border-color: var(--primary-dark);
   }
   button:disabled {
-    background-color: var(--gray-light);
-    border-color: var(--gray-light);
-    color: var(--gray);
+    background-color: var(--gray-light) !important;
+    border-color: var(--gray-light) !important;
+    color: var(--gray) !important;
   }
   input[type="url"],
   input[type="text"] {

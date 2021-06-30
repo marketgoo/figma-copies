@@ -197,7 +197,7 @@ const actions = {
     }
 
     // Use a proxy to avoid CORS errors
-    const url = new URL("https://oscarotero.com/proxy.php");
+    const url = new URL("https://google-sheet.mktgoo.workers.dev/");
     url.searchParams.set("url", pluginMessage.url);
 
     const response = await fetch(url);

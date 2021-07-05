@@ -185,7 +185,10 @@ function getChartStyle(node, index) {
 }
 
 function getCopyRanges(html) {
-  return html.split(/<[^>]+>/).filter((value) => value !== "");
+  return html
+    .replaceAll(/\s*(<br \/>|<br>)\s*/g, "\n")
+    .split(/<[^>]+>/)
+    .filter((value) => value !== "");
 }
 
 function getTextNodes(nodes: (PageNode | SceneNode)[]): TextNode[] {

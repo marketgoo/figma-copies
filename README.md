@@ -1,5 +1,7 @@
 # Figma copies by marketgoo
 
+![cover](cover.png)
+
 ## Development
 
 ```sh

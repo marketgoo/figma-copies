@@ -6,6 +6,7 @@
       <span>Url:</span>
       <input type="url" name="url" value="" required placeholder="The TSV url of the Google Spreadsheet">
     </label>
+    <p class="help">In the Google Spreadsheet document, go to File &gt; Publish to the web, enable it and copy the url of the .tsv (Tab-separated values) format.</p>
   </div>
 
   <footer>
@@ -26,7 +27,7 @@
     row-gap: 15px;
     margin: 0;
     min-height: 100vh;
-    padding: 15px;
+    padding: 15px 15px 5px;
     box-sizing: border-box;
     --black: #2c333e;
     --gray: #57657a;
@@ -44,6 +45,11 @@
   .errors {
     color: var(--error);
   }
+  .help {
+    font-size: 0.9em;
+    color: var(--gray);
+    margin-left: 88px;
+  }
   form {
     margin: 0;
     display: grid;
@@ -53,9 +59,11 @@
     position: sticky;
     display: flex;
     flex-direction: row-reverse;
-    column-gap: 20px;
-    bottom: 0;
+    column-gap: 10px;
+    bottom: 0px;
     background-color: white;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
   button {
     background: var(--primary);
@@ -65,11 +73,11 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    border-radius: 20px;
+    border-radius: 6px;
     font-size: 15px;
     font-weight: 500;
     color: white;
-    padding: 0 30px;
+    padding: 0 20px;
     outline: 0;
   }
   button:hover {
@@ -124,7 +132,13 @@
     flex-grow: 1;
   }
   fieldset {
-    border: solid 1px #ddd;
+    border: none;
+    margin-bottom: 1em;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  fieldset + fieldset {
+    margin-top: 2em;
   }
   legend {
     color: #666;
@@ -157,7 +171,7 @@ const responses = {
       }
       hasVariables = true;
       html.push("<fieldset>");
-      html.push(`<legend>${node.copy}</legend>`);
+      html.push(`<legend>${escape(node.copy)}</legend>`);
   
       for (const [name, value] of entries) {
         html.push(`<p><label><code>${name.trim()}</code> <input placeholder="Value for this variable" type="text" name="${node.node.id}-${name}" value="${value.replace('"', "&quot;")}"></label></p>`);
@@ -243,4 +257,13 @@ function parseCopies(text) {
 
   return copies;
 }
+
+// Function to escape HTML tags
+function escape(html) {
+  return html
+    .replaceAll(/&/g, "&amp;")
+    .replaceAll(/</g, "&lt;")
+    .replaceAll(/>/g, "&gt;");
+}
+
 </script>

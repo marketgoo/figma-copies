@@ -9,6 +9,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Any Google Spreadsheet public url will be converted to .tsv
 
+### Fixed
+- TSV parser.
+- Ignore empty copies.
+
 ## [0.1.2] - 2021-07-19
 ### Fixed
 - UI improvements.

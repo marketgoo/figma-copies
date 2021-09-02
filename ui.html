@@ -252,7 +252,10 @@ function parseCopies(text) {
 
   text.split("\n").forEach((line) => {
     const [key, copy] = line.split("\t", 2);
-    copies[key.trim()] = copy.trim();
+
+    if (key && copy) {
+      copies[key.trim()] = copy.trim();
+    }
   });
 
   return copies;

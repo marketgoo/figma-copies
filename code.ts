@@ -27,12 +27,16 @@ figma.showUI(__html__, {
 figma.ui.postMessage({
   type: "url",
   url: figma.root.getPluginData("url"),
+  url_2: figma.root.getPluginData("url_2"),
+  url_3: figma.root.getPluginData("url_3"),
 });
 
 figma.ui.onmessage = async (msg) => {
   switch (msg.type) {
     case "update":
       figma.root.setPluginData("url", msg.url);
+      figma.root.setPluginData("url_2", msg.url_2);
+      figma.root.setPluginData("url_3", msg.url_3);
       await searchCopies(msg);
       break;
     case "info":

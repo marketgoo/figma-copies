@@ -7,11 +7,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.2.0] - Unreleased
 ### Added
-- New command *Reset layer names*.
+- New command _Reset layer names_.
 - New button to select the text layer while editing the variables.
 
 ### Changed
-- The plugin has been refactored using [Create Figma Plugin](https://yuanqing.github.io/create-figma-plugin/).
+- The plugin has been refactored using
+  [Create Figma Plugin](https://yuanqing.github.io/create-figma-plugin/).
 - The UI style is similar to Figma.
 
 ## [0.1.4] - 2021-09-15

@@ -6,8 +6,8 @@
 
 1. Create a Google Spreadsheet document with two columns. One for the copy id
    and other for the text.
-2. Publish the document to web, and copy the url of the `.tsv`.
-3. Run the plugin in Figma and paste the `.tsv` url.
+2. Publish the document to web, and copy the public URL.
+3. Run the plugin in Figma and paste the public URL.
 4. All text layers with the same name of any copy id will be updated with the
    copy text.
 
@@ -61,13 +61,3 @@ Use `console.log` statements to inspect values in your code.
 
 To open the developer console, search for and run `Open Console` via the Quick
 Actions search bar.
-
-## See also
-
-- [Create Figma Plugin docs](https://yuanqing.github.io/create-figma-plugin/)
-- [`yuanqing/figma-plugins`](https://github.com/yuanqing/figma-plugins#readme)
-
-Official docs and code samples from Figma:
-
-- [Plugin API docs](https://figma.com/plugin-docs/)
-- [`figma/plugin-samples`](https://github.com/figma/plugin-samples#readme)

@@ -1,0 +1,13 @@
+.labelVariable {
+  display: block;
+}
+.labelVariable-text {
+  display: flex;
+  align-items: center;
+}
+.labelVariable-text > button {
+  flex-shrink: 0;
+}
+.center {
+  text-align: center;
+}

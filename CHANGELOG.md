@@ -8,6 +8,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.2.0] - 2022-09-07
 ### Added
 - New command _Reset layer names_.
+- New command _Get missing copies_.
 - New button to select the text layer while editing the variables.
 - New option to filter the empty variables.
 

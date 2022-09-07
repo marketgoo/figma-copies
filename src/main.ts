@@ -2,25 +2,25 @@ import { emit, on, showUI } from "@create-figma-plugin/utilities";
 import { NodeInfo, ResizeWindowHandler, SourceCopies } from "./types";
 import { getTextNodes, updateNodeCopy } from "./utils";
 
+on<ResizeWindowHandler>(
+  "RESIZE_WINDOW",
+  (windowSize: { width: number; height: number }) => {
+    const { width, height } = windowSize;
+    figma.ui.resize(width, height);
+  },
+);
+showUI({
+  height: 400,
+  width: 500,
+});
+
+// Get the nodes from the selection or the whole document
+const selection = figma.currentPage.selection.slice();
+const textNodes = selection.length
+  ? getTextNodes(selection)
+  : figma.currentPage.findAll((node) => node.type === "TEXT") as TextNode[];
+
 export default function () {
-  on<ResizeWindowHandler>(
-    "RESIZE_WINDOW",
-    (windowSize: { width: number; height: number }) => {
-      const { width, height } = windowSize;
-      figma.ui.resize(width, height);
-    },
-  );
-  showUI({
-    height: 400,
-    width: 500,
-  });
-
-  // Get the nodes from the selection or the whole document
-  const selection = figma.currentPage.selection.slice();
-  const textNodes = selection.length
-    ? getTextNodes(selection)
-    : figma.currentPage.findAll((node) => node.type === "TEXT") as TextNode[];
-
   // List of Nodes with copies
   let nodes: NodeInfo[] = [];
 
@@ -65,17 +65,6 @@ export default function () {
     }
   });
 
-  // Select a text node
-  on("SELECT_NODE", (data: NodeInfo) => {
-    const node = figma.currentPage.findOne((node) =>
-      node.id === data.node.id
-    ) as TextNode;
-    if (node) {
-      figma.currentPage.selection = [node];
-      figma.viewport.scrollAndZoomIntoView([node]);
-    }
-  });
-
   // Update the variables
   on("UPDATE_VARS", (data: NodeInfo[]) => {
     data.forEach((info) => {
@@ -92,6 +81,17 @@ export default function () {
     updateCopies(nodes);
   });
 }
+
+// Select a text node
+on("SELECT_NODE", (data: NodeInfo) => {
+  const node = figma.currentPage.findOne((node) =>
+    node.id === data.node.id
+  ) as TextNode;
+  if (node) {
+    figma.currentPage.selection = [node];
+    figma.viewport.scrollAndZoomIntoView([node]);
+  }
+});
 
 // Close the plugin when the UI is closed
 on("CLOSE", () => figma.closePlugin());

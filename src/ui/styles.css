@@ -17,3 +17,11 @@
 .center {
   text-align: center;
 }
+.table {
+  user-select: initial;
+  cursor: text;
+  font-size: var(--font-size-11);
+}
+.table th {
+  text-align: left;
+}

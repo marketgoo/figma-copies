@@ -18,6 +18,10 @@
     {
       "name": "Reset layer names",
       "command": "src/reset-names.ts--default"
+    },
+    {
+      "name": "Get missing copies",
+      "command": "src/missing-copies.ts--default"
     }
   ]
 }

@@ -13,6 +13,7 @@ import { fetchCopies } from "./ui/utils";
 import SourceForm from "./ui/source-form";
 import VariablesForm from "./ui/variables-form";
 import Completed from "./ui/completed";
+import MissingCopies from "./ui/missing-copies";
 import "!./ui/styles.css";
 
 import type { NodeInfo, ResizeWindowHandler, SourceUrls } from "./types";
@@ -60,6 +61,13 @@ function Main() {
     });
   });
 
+  on("UNTRANSLATED", (data) => {
+    setState({
+      type: "untranslated",
+      data: { nodes: data.nodes },
+    });
+  });
+
   async function handleSubmitUrls(data: SourceUrls) {
     setState({ type: "loading", data: { title: "Loading copies..." } });
     const copies = await fetchCopies(...Object.values(data));
@@ -103,6 +111,13 @@ function Main() {
       )}
       {state.type === "completed" && (
         <Completed title={state.data.title} onSubmit={handleCompleted} />
+      )}
+      {state.type === "untranslated" && (
+        <MissingCopies
+          nodes={state.data.nodes}
+          onClose={handleCompleted}
+          onSelectNode={handleSelectNode}
+        />
       )}
     </Container>
   );

@@ -30,6 +30,11 @@
       {
         "name": "Reset layer names",
         "main": "src/reset-names.ts"
+      },
+      {
+        "name": "Get missing copies",
+        "main": "src/missing-copies.ts",
+        "ui": "src/ui.tsx"
       }
     ]
   }

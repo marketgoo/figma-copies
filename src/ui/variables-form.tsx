@@ -6,8 +6,10 @@ import {
   Stack,
   Text,
   Textbox,
+  Toggle,
   VerticalSpace,
 } from "@create-figma-plugin/ui";
+import { useState } from "preact/hooks";
 import { h } from "preact";
 
 import type { NodeInfo } from "../types";
@@ -21,6 +23,16 @@ interface Props {
 export default function VariablesForm(
   { nodes, onSubmit, onSelectNode }: Props,
 ) {
+  const [filterEmpty, setFilterEmpty] = useState<boolean>(false);
+
+  nodes.sort((a, b) => a.copy.localeCompare(b.copy));
+
+  if (filterEmpty) {
+    nodes = nodes.filter((node) =>
+      Object.values(node.vars).some((val) => !val)
+    );
+  }
+
   function handleSubmitForm(ev: Event) {
     ev.preventDefault();
 
@@ -38,19 +50,28 @@ export default function VariablesForm(
   return (
     <form onSubmit={handleSubmitForm}>
       <VerticalSpace space="large" />
-      <Text>Update the dynamic variables of your copies</Text>
-      <VerticalSpace space="large" />
+      <Text>Update the dynamic variables of your copies:</Text>
+      <VerticalSpace space="small" />
+      <Inline space="extraSmall">
+        <Toggle
+          value={filterEmpty}
+          onChange={(ev) => setFilterEmpty(ev.currentTarget.checked)}
+        >
+          <Text>Only empty variables</Text>
+        </Toggle>
+      </Inline>
+      <VerticalSpace space="extraLarge" />
 
       <Stack space="large">
         {nodes.map((node, index) => (
           <div class="labelVariable">
             <div class="labelVariable-text">
-              <IconButton type="button" onClick={() => onSelectNode(node)}>
-                <IconPlus32 />
-              </IconButton>
               <label for={"node-" + index + "-0"}>
                 <Text>{node.copy}</Text>
               </label>
+              <IconButton type="button" onClick={() => onSelectNode(node)}>
+                <IconPlus32 />
+              </IconButton>
             </div>
             <Inline space="extraSmall">
               {Object.entries(node.vars).map(([name, value], i) => (

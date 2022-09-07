@@ -7,6 +7,12 @@
 }
 .labelVariable-text > button {
   flex-shrink: 0;
+  margin-top: -8px;
+  margin-bottom: -8px;
+}
+.labelVariable-text > label {
+  flex-grow: 1;
+  margin-bottom: 5px;
 }
 .center {
   text-align: center;

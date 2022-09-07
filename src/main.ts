@@ -15,15 +15,29 @@ export default function () {
     width: 500,
   });
 
+  // Get the nodes from the selection or the whole document
+  const selection = figma.currentPage.selection.slice();
+  const textNodes = selection.length
+    ? getTextNodes(selection)
+    : figma.currentPage.findAll((node) => node.type === "TEXT") as TextNode[];
+
   // List of Nodes with copies
   let nodes: NodeInfo[] = [];
 
-  // Send document defaults
-  emit("DEFAULTS", {
-    url: figma.root.getPluginData("url"),
-    url_2: figma.root.getPluginData("url_2"),
-    url_3: figma.root.getPluginData("url_3"),
-  });
+  if (!textNodes.length) {
+    emit("COMPLETED", {
+      title: selection.length
+        ? "No text nodes found in the selection"
+        : "No text nodes found in the document",
+    });
+  } else {
+    // Send document defaults
+    emit("DEFAULTS", {
+      url: figma.root.getPluginData("url"),
+      url_2: figma.root.getPluginData("url_2"),
+      url_3: figma.root.getPluginData("url_3"),
+    });
+  }
 
   // The copies have been loaded
   on("FETCHED_COPIES", (data: SourceCopies) => {
@@ -31,12 +45,6 @@ export default function () {
     figma.root.setPluginData("url", data.url);
     figma.root.setPluginData("url_2", data.url_2);
     figma.root.setPluginData("url_3", data.url_3);
-
-    // Get the nodes from the selection or the whole document
-    const selection = figma.currentPage.selection.slice();
-    const textNodes = selection.length
-      ? getTextNodes(selection)
-      : figma.currentPage.findAll((node) => node.type === "TEXT") as TextNode[];
 
     // Search and replace the text nodes with the copies
     nodes = getCopiesNodes(textNodes, data.copies);
@@ -46,9 +54,14 @@ export default function () {
 
     if (requiredInfo.length) {
       emit("REQUIRE_VARS", { nodes: requiredInfo });
-    } else {
+    } else if (nodes.length) {
       // Update the copies
       updateCopies(nodes);
+    } else {
+      const title = selection.length
+        ? "No copies found in the selection"
+        : "No copies found in the document";
+      emit("COMPLETED", { title });
     }
   });
 
@@ -117,8 +130,12 @@ async function updateCopies(nodes: NodeInfo[]): Promise<void> {
     Promise.all(
       nodes.map(({ node, copy, vars }) => updateNodeCopy(node, copy, vars)),
     );
-    emit("COMPLETED");
+    emit("COMPLETED", {
+      title: "Copies have been updated successfully!",
+    });
   } catch (err) {
-    console.error(err);
+    emit("COMPLETED", {
+      title: `There was an error updating the copies (${err})`,
+    });
   }
 }

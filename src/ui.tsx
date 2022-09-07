@@ -56,7 +56,7 @@ function Main() {
   on("COMPLETED", (data) => {
     setState({
       type: "completed",
-      data: { title: "Copies have been updated successfully!" },
+      data: { title: data.title },
     });
   });
 

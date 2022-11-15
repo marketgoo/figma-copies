@@ -10,7 +10,7 @@ import {
   VerticalSpace,
 } from "@create-figma-plugin/ui";
 import { useState } from "preact/hooks";
-import { h } from "preact";
+import { h, JSX } from "preact";
 
 import type { NodeInfo } from "../types";
 
@@ -75,12 +75,10 @@ export default function VariablesForm(
             </div>
             <Inline space="extraSmall">
               {Object.entries(node.vars).map(([name, value], i) => (
-                <Textbox
+                <InputBox
                   name={node.node.id + "-" + name}
                   id={"node-" + index + "-" + i}
                   value={value}
-                  variant="border"
-                  placeholder={name.trim()}
                 />
               ))}
             </Inline>
@@ -95,5 +93,31 @@ export default function VariablesForm(
       </Inline>
       <VerticalSpace space="small" />
     </form>
+  );
+}
+
+interface InputProps {
+  name: string;
+  id: string;
+  value: string;
+}
+
+function InputBox({ name, id, value }: InputProps) {
+  const [val, setVal] = useState(value);
+
+  function handleInput(ev: JSX.TargetedEvent<HTMLInputElement>) {
+    const newValue = ev.currentTarget.value;
+    setVal(newValue);
+  }
+
+  return (
+    <Textbox
+      name={name}
+      id={id}
+      value={val}
+      variant="border"
+      placeholder={name.trim()}
+      onInput={handleInput}
+    />
   );
 }
